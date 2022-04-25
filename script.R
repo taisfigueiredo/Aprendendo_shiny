@@ -9,7 +9,7 @@ usethis::use_readme_md()
 
 
 usethis::use_git("Capítulo 2")
-usethis::pr_init(branch = "master")
+usethis::pr_init(branch = "teste")
 usethis::pr_push()
 
 
