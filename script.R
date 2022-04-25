@@ -9,9 +9,9 @@ usethis::use_readme_md()
 
 
 usethis::use_git("Capítulo 2")
-usethis::pr_init(branch = "master")
+usethis::pr_init(branch = "teste")
 usethis::pr_push()
-
+usethis::pr_merge_main()
 
 
 library(shiny)
@@ -226,7 +226,7 @@ server <- function(input, output, session){
 
 shinyApp(ui = ui, server = server)
 
-#----------------
+#--------------------
 
 
 ui <- fluidPage(
@@ -257,7 +257,123 @@ server <- function(input, output, session){
 shinyApp(ui = ui, server = server)
 
 
-#---------------------
+#-----------------------
+
+# As funções de saída são usadas na UI para exibir as saídas construídas no servidor com funções de renderização.
+#Para nosso app de perguntas e respostas, usamos duas funções textOutput para exibir as saídas de perguntas e respostas
+#funções de saída: tableOutput() or dataTableOutput(), imageOutput(), plotOutput()
+
+ui = fluidPage(
+  textInput("name", "Enter a name:"),
+  selectInput("animal", "Dogs or cats?", choices = c("dogs", "cats")),
+  textOutput("question"),
+  textOutpu("answer")
+)
+
+#Existem pacotes fora do shiny que fornecem maneiras de construir saídas com funções de renderização e saída
+
+
+#Exemplo DT
+
+library(babynames)
+library(shiny)
+library(tidyverse)
+
+ui = fluidPage(
+  DT::DTOutput("babynames_table")
+)
+
+server = function(input, output){
+  output$babynames_table = DT::renderDT({
+    babynames %>% 
+      dplyr::sample_frac(.1)
+  })
+}
+
+
+shinyApp(ui = ui, server = server)
+
+#---------------------------- Tabela 
+
+ui <- fluidPage(
+  titlePanel("What's in a Name?"),
+  # Add select input named "sex" to choose between "M" and "F"
+  selectInput('sex', 'Select Sex', choices = c("F", "M")),
+  # Add slider input named "year" to select year between 1900 and 2010
+  sliderInput('year', 'Select Year', min = 1900, max = 2010, value = 1900),
+  # CODE BELOW: Add table output named "table_top_10_names"
+  tableOutput('table_top_10_names')
+)
+server <- function(input, output, session){
+  # Function to create a data frame of top 10 names by sex and year 
+  top_10_names <- function(){
+    babynames %>% 
+      filter(sex == input$sex) %>% 
+      filter(year == input$year) %>% 
+      top_n(10, prop)
+  }
+  # CODE BELOW: Render a table output named "table_top_10_names"
+  output$table_top_10_names <- renderTable({
+    top_10_names()
+  })
+}
+shinyApp(ui = ui, server = server)
+
+
+#---------------------------- Tabela com DT
+
+ui <- fluidPage(
+  titlePanel("What's in a Name?"),
+  # Add select input named "sex" to choose between "M" and "F"
+  selectInput('sex', 'Select Sex', choices = c("M", "F")),
+  # Add slider input named "year" to select year between 1900 and 2010
+  sliderInput('year', 'Select Year', min = 1900, max = 2010, value = 1900),
+  # MODIFY CODE BELOW: Add a DT output named "table_top_10_names"
+  DT::DTOutput('table_top_10_names')
+)
+server <- function(input, output, session){
+  top_10_names <- function(){
+    babynames %>% 
+      filter(sex == input$sex) %>% 
+      filter(year == input$year) %>% 
+      top_n(10, prop)
+  }
+  # MODIFY CODE BELOW: Render a DT output named "table_top_10_names"
+  output$table_top_10_names <- DT::renderDT({
+    top_10_names()
+  })
+}
+shinyApp(ui = ui, server = server)
+
+
+#-------------------------  Interactive plot output
+library(plotly)
+
+top_trendy_names = babynames %>% top_n(30, prop)
+
+ui <- fluidPage(
+  selectInput('name', 'Select Name', top_trendy_names$name),
+  # CODE BELOW: Add a plotly output named 'plot_trendy_names'
+  plotly::plotlyOutput('plot_trendy_names')
+)
+server <- function(input, output, session){
+  # Function to plot trends in a name
+  plot_trends <- function(){
+    babynames %>% 
+      filter(name == input$name) %>% 
+      ggplot(aes(x = year, y = n)) +
+      geom_col()
+  }
+  # CODE BELOW: Render a plotly output named 'plot_trendy_names'
+  output$plot_trendy_names <- plotly::renderPlotly({
+    plot_trends()
+  })
+}
+shinyApp(ui = ui, server = server)
+
+
+#-------------------------- Layouts and themes 
+
 
 
 
