@@ -1,25 +1,27 @@
 
 usethis::use_git()
 usethis::use_github()
+usethis::use_readme_md()
 
 #----------------------------------------------------------------------------------------------------------------------------------------#
 #                                               Building web applications with shiny in R                                                #
 #----------------------------------------------------------------------------------------------------------------------------------------#
 
-usethis::use_git()
-usethis::use_github()
-usethis::use_readme_md()
-usethis::pr_init()
-usethis::use_git("Shiny")
+
+usethis::use_git("Capítulo 2")
+usethis::pr_init(branch = "master")
 usethis::pr_push()
 
 
 
+library(shiny)
+library(babynames)
+library(ggplot2)
+library(tidyverse)
+
+
 #-----------------------------------------------------------  CAPÍTULO 1  -------------------------------------------------------------#
 
-
-
-library(shiny)
 
 ui = fluidPage()
 
@@ -153,4 +155,109 @@ shinyApp(ui = ui, server = server)
 
 
 
-#---------------------------------------------------------    CAPÍTULO 2   ------------------------------------------------------------#
+#----------------------------------------------------------    CAPÍTULO 2   ----------------------------------------------------------------#
+
+#Input functions
+#O inputId precisa ser uma string de caracteres e cada entrada deve ter um ID exclusivo para que você possa consultá-lo no servidor para
+#fazer atualizações no aplicativo
+
+#Um selectInput requer uma lista de opções. O usuário verá automaticamente a primeira escolha na lista.
+
+# Um sliderInput requer um valor no qual o controle deslizante será definido por padrão, um mínimo e um máximo dos outros valores que os usuários podem escolher.
+
+
+selectInput("inputId",
+            "label",
+            choices = c("A", "B", "C"))
+
+
+sliderInput("inputId", 
+            "label",
+            value = 1925,
+            min = 1900,
+            max = 2000)
+
+ui = fluidPage(
+  textInput("name", "Enter a name:"),
+  selectInput("animal", "Dogs or cats?", choices = c("dogs", "cats")),
+  textOutput("greeting"),
+  textOutput("answer")
+)
+
+server = function(input, output, session){
+  output$greeting = renderText({
+    paste("Do u prefer dogs or cats,", input$name, "?")
+  })
+  output$answer = renderText({
+    paste("I prefer", input$animal, "!")
+  })
+}
+
+# se liga: Os ids precisam ser únicos, caso contrário, você não poderá consultá-los no servidor.
+
+shinyApp(ui = ui, server = server)
+
+
+
+#-----------------------------
+
+ui <- fluidPage(
+  titlePanel("What's in a Name?"),
+  # CODE BELOW: Add select input named "sex" to choose between "M" and "F"
+  selectInput('sex', 'Select Sex', choices = c("F", "M")),
+  # Add plot output to display top 10 most popular names
+  plotOutput('plot_top_10_names')
+)
+
+server <- function(input, output, session){
+  # Render plot of top 10 most popular names
+  output$plot_top_10_names <- renderPlot({
+    # Get top 10 names by sex and year
+    top_10_names <- babynames %>% 
+      # MODIFY CODE BELOW: Filter for the selected sex
+      filter(sex == input$sex) %>% 
+      filter(year == 1900) %>% 
+      top_n(10, prop)
+    # Plot top 10 names by sex and year
+    ggplot(top_10_names, aes(x = name, y = prop)) +
+      geom_col(fill = "#263e63")
+  })
+}
+
+shinyApp(ui = ui, server = server)
+
+#----------------
+
+
+ui <- fluidPage(
+  titlePanel("What's in a Name?"),
+  # Add select input named "sex" to choose between "M" and "F"
+  selectInput('sex', 'Select Sex', choices = c("F", "M")),
+  # CODE BELOW: Add slider input named 'year' to select years (1900 - 2010)
+  sliderInput('year', 'Select Year', min = 1900, max = 2010, value = 1900),
+  # Add plot output to display top 10 most popular names
+  plotOutput('plot_top_10_names')
+)
+
+server <- function(input, output, session){
+  # Render plot of top 10 most popular names
+  output$plot_top_10_names <- renderPlot({
+    # Get top 10 names by sex and year
+    top_10_names <- babynames %>% 
+      filter(sex == input$sex) %>% 
+      # MODIFY CODE BELOW: Filter for the selected year
+      filter(year == input$year) %>% 
+      top_n(10, prop)
+    # Plot top 10 names by sex and year
+    ggplot(top_10_names, aes(x = name, y = prop)) +
+      geom_col(fill = "#263e63")
+  })
+}
+
+shinyApp(ui = ui, server = server)
+
+
+#---------------------
+
+
+
