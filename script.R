@@ -280,6 +280,7 @@ library(shiny)
 library(tidyverse)
 library(shinythemes)
 
+
 ui = fluidPage(
   DT::DTOutput("babynames_table")
 )
@@ -374,6 +375,7 @@ shinyApp(ui = ui, server = server)
 
 
 #-------------------------- Layouts and themes 
+
 
 ui = fluidPage(
   titlePanel("histogram"),
@@ -484,6 +486,7 @@ server <- function(input, output, session){
   })
 }
 shinyApp(ui = ui, server = server)
+
 
 
 #--------------------- 
