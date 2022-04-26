@@ -8,7 +8,7 @@ usethis::use_readme_md()
 #----------------------------------------------------------------------------------------------------------------------------------------#
 
 
-usethis::use_git("Capítulo 2")
+usethis::use_git("Capítulo 2 - mais")
 usethis::pr_init(branch = "teste")
 usethis::pr_push()
 usethis::pr_merge_main()
@@ -36,7 +36,7 @@ server = function(input, output, session){}
 shinyApp(ui = ui, server = server)
 
 
-#Exemplo simples de App:
+#Exemplo simples de App :
 
 library(shiny)
 
