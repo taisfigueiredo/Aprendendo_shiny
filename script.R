@@ -278,6 +278,8 @@ ui = fluidPage(
 library(babynames)
 library(shiny)
 library(tidyverse)
+library(shinythemes)
+
 
 ui = fluidPage(
   DT::DTOutput("babynames_table")
@@ -375,5 +377,117 @@ shinyApp(ui = ui, server = server)
 #-------------------------- Layouts and themes 
 
 
+ui = fluidPage(
+  titlePanel("histogram"),
+  sliderInput("nb_bins", "# Bins", 5, 10, 5),
+  plotOutput("hist")
+)
 
+server = function(input, output, session){
+  output$hist = renderPlot({
+    hist(faithful$waiting,
+         breaks = input$nb_bins,
+         col = "steelblue")
+  })
+}
+
+shinyApp(ui = ui, server = server)
+
+#--
+
+ui = fluidPage(
+  titlePanel("histogram"),
+  sidebarLayout(
+ sidebarPanel( sliderInput("nb_bins", 
+                           "# Bins", 5, 10, 5)),
+  mainPanel(plotOutput("hist"))
+)
+)
+
+server = function(input, output, session){
+  output$hist = renderPlot({
+    hist(faithful$waiting,
+         breaks = input$nb_bins,
+         col = "steelblue")
+  })
+}
+
+shinyApp(ui = ui, server = server)
+
+
+#tabsetPanel dentro do painel principal para adicionar uma aba
+#Cada guia individual deve ser criada com tabPanel e você deve dar a cada uma delas um rótulo
+#Para escolher temas - Exemplo:   shinythemes::themeSelector() -> Para escolher um tema para o app
+
+ui = fluidPage(
+  titlePanel("histogram"),
+  theme = shinytheme("superhero"), #Tema pré selecionado
+  sidebarLayout(
+    sidebarPanel( sliderInput("nb_bins", 
+                              "# Bins", 5, 10, 1)),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("waiting",
+                 plotOutput("hist_waiting")),
+        tabPanel("Eruptions",
+                 plotOutput("hist_eruptions"))
+      )
+      
+    )
+  )
+)
+
+server = function(input, output, session){
+  output$hist_waiting = renderPlot({
+    hist(faithful$waiting,
+         breaks = input$nb_bins,
+         col = "steelblue")
+  }) 
+  output$hist_eruptions = renderPlot({
+    hist(faithful$eruptions,
+         beaks = input$nb_bins,
+         col = "steelblue")
+  })
+}
+
+
+shinyApp(ui = ui, server = server)
+
+
+#--------------------- sidebar lauout
+
+ui <- fluidPage(
+  # MODIFY CODE BELOW: Wrap in a sidebarLayout
+  sidebarLayout(
+    # MODIFY CODE BELOW: Wrap in a sidebarPanel
+    sidebarPanel(
+      selectInput('name', 'Select Name', top_trendy_names$name)),
+    # MODIFY CODE BELOW: Wrap in a mainPanel
+    mainPanel(
+      plotly::plotlyOutput('plot_trendy_names'),
+      DT::DTOutput('table_trendy_names')
+    )))
+# DO NOT MODIFY
+server <- function(input, output, session){
+  # Function to plot trends in a name
+  plot_trends <- function(){
+    babynames %>% 
+      filter(name == input$name) %>% 
+      ggplot(aes(x = year, y = n)) +
+      geom_col()
+  }
+  output$plot_trendy_names <- plotly::renderPlotly({
+    plot_trends()
+  })
+  
+  output$table_trendy_names <- DT::renderDT({
+    babynames %>% 
+      filter(name == input$name)
+  })
+}
+shinyApp(ui = ui, server = server)
+
+
+
+#--------------------- 
 
