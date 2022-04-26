@@ -278,6 +278,7 @@ ui = fluidPage(
 library(babynames)
 library(shiny)
 library(tidyverse)
+library(shinythemes)
 
 ui = fluidPage(
   DT::DTOutput("babynames_table")
@@ -414,11 +415,11 @@ shinyApp(ui = ui, server = server)
 
 #tabsetPanel dentro do painel principal para adicionar uma aba
 #Cada guia individual deve ser criada com tabPanel e você deve dar a cada uma delas um rótulo
-#Para escolher temas - Exemplo:   shinythemes::themeSelector("superhero)
+#Para escolher temas - Exemplo:   shinythemes::themeSelector() -> Para escolher um tema para o app
 
 ui = fluidPage(
   titlePanel("histogram"),
-  shinythemes::themeSelector(),
+  theme = shinytheme("superhero"), #Tema pré selecionado
   sidebarLayout(
     sidebarPanel( sliderInput("nb_bins", 
                               "# Bins", 5, 10, 1)),
